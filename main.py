@@ -19,14 +19,14 @@ drawing_utils = mp.solutions.drawing_utils
 
 while True:
     _ , image = webcamera.read()
-    image = cv2.flip(image,1)
+    image = cv2.flip(image, 1)
     frame_heigth, frame_width, _ = image.shape
-    rgb_image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     output = my_hands.process(rgb_image)
     hands = output.multi_hand_landmarks
     if hands :
         for hand in hands:
-            drawing_utils.draw_landmarks(image,hand)
+            drawing_utils.draw_landmarks(image, hand) # отрисовываем точки на руке
             landmarks = hand.landmark
             for id, landmark in enumerate(landmarks):
                 x = int(landmark.x * frame_width)
@@ -39,8 +39,12 @@ while True:
                     cv2.circle(img=image, center=(x,y), radius=4, color=(0, 0, 255), thickness=3)
                     x2 = x
                     y2 = y 
+
+        # рассчет расстояния между двумя точками на руке
         dist = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
         cv2.line(image,(x1, y1),(x2, y2),(0, 255, 0), 3)
+
+        # управление громкостью на основе расстояния между точками
         if dist >= 120 and dist < 160:
             command = "osascript -e 'set volume output volume 20'"
             os.system(command)
@@ -64,5 +68,5 @@ while True:
     if key == 27:
         break
 
-webcamera.release()
+webcamera.release() # освобожаем ресурсы камеры
 cv2.destroyAllWindows()
